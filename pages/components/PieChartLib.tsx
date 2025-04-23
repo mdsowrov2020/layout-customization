@@ -1,24 +1,6 @@
 import React from "react";
-import {
-  BarChart,
-  Bar,
-  Rectangle,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  ComposedChart,
-  Area,
-  Line,
-  Scatter,
-  PieChart,
-  Pie,
-  Cell,
-} from "recharts";
-import BarChartLib from "./BarChartLib";
-import ComposeChart from "./ComposeChart";
+import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
+
 const data = [
   { name: "Group A", value: 400 },
   { name: "Group B", value: 300 },
@@ -29,6 +11,17 @@ const data = [
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
 const RADIAN = Math.PI / 180;
+
+interface CustomizedLabelProps {
+  cx: number;
+  cy: number;
+  midAngle: number;
+  innerRadius: number;
+  outerRadius: number;
+  percent: number;
+  index: number;
+}
+
 const renderCustomizedLabel = ({
   cx,
   cy,
@@ -37,7 +30,7 @@ const renderCustomizedLabel = ({
   outerRadius,
   percent,
   index,
-}) => {
+}: CustomizedLabelProps) => {
   const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
   const x = cx + radius * Math.cos(-midAngle * RADIAN);
   const y = cy + radius * Math.sin(-midAngle * RADIAN);
@@ -54,6 +47,7 @@ const renderCustomizedLabel = ({
     </text>
   );
 };
+
 const PieChartLib = () => {
   return (
     <div style={{ height: "400px" }}>
