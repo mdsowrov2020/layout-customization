@@ -2,31 +2,24 @@ import React, { useState } from "react";
 import { Card, Col, Row, Typography } from "antd";
 import { statistics, charts } from "@/pages/data/data";
 import CustomGridSelect from "./CustomGridSelect";
+import { GridSettings } from "../types";
 
 interface MainProps {
   activeSettings: {
-    stats: {
-      visibleComponents: string[];
-      defaultGrid: number;
-      customGrids: Record<string, number>;
-    };
-    charts: {
-      visibleComponents: string[];
-      defaultGrid: number;
-      customGrids: Record<string, number>;
-    };
+    stats: GridSettings;
+    charts: GridSettings;
   };
-  selectionType: string | null;
+  selectionType: "stats" | "charts" | null;
   currentScreen: string;
   onGridChange: (type: "stats" | "charts", id: string, value: number) => void;
 }
 
-const Main = ({
+const Main: React.FC<MainProps> = ({
   activeSettings,
   selectionType,
   currentScreen,
   onGridChange,
-}: MainProps) => {
+}) => {
   const [selectedCard, setSelectedCard] = useState<{
     id: string;
     type: "stats" | "charts";
@@ -51,10 +44,14 @@ const Main = ({
     title: string,
     type: "stats" | "charts"
   ) => {
-    const { visibleComponents, defaultGrid, customGrids } =
-      activeSettings[type];
+    // Safely get visibleComponents with fallback to empty array
+    const visibleComponents = activeSettings[type]?.visibleComponents || [];
+    const defaultGrid =
+      activeSettings[type]?.defaultGrid || (type === "stats" ? 4 : 12);
+    const customGrids = activeSettings[type]?.customGrids || {};
+
     const visibleCards = cards.filter((card) =>
-      visibleComponents.includes(String(card.id))
+      visibleComponents.includes(card.id)
     );
 
     if (visibleCards.length === 0) return null;
@@ -65,8 +62,7 @@ const Main = ({
         <Row gutter={[16, 16]}>
           {visibleCards.map((card) => {
             const isSelected =
-              Number(selectedCard?.id) === card.id &&
-              selectedCard?.type === type;
+              selectedCard?.id === card.id && selectedCard.type === type;
             const isEditable = !selectionType || selectionType === type;
             const gridValue = customGrids[card.id] || defaultGrid;
 
@@ -83,9 +79,7 @@ const Main = ({
                 }}
               >
                 <div
-                  onClick={() =>
-                    isEditable && handleCardClick(String(card.id), type)
-                  }
+                  onClick={() => isEditable && handleCardClick(card.id, type)}
                   style={{ cursor: isEditable ? "pointer" : "default" }}
                 >
                   {card.component}
@@ -95,7 +89,7 @@ const Main = ({
                     <CustomGridSelect
                       currentValue={gridValue}
                       onChange={handleLayoutChange}
-                      selectedCardId={String(card.id)}
+                      selectedCardId={card.id}
                     />
                   </div>
                 )}

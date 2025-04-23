@@ -1,6 +1,7 @@
 import BarChartLib from "../components/BarChartLib";
 import ComposeChart from "../components/ComposeChart";
 import PieChartLib from "../components/PieChartLib";
+import { Chart, Statistic } from "../model/type";
 import ActiveUserCard from "../ui/ActiveUserCard";
 import FreeUserCard from "../ui/FreeUserCard";
 import StatisticCard from "../ui/StatisticCard";
@@ -8,7 +9,7 @@ import TotalExpenseCard from "../ui/TotalExpenseCard";
 import TotalSaleCard from "../ui/TotalSaleCard";
 import UserCountCard from "../ui/UserCountCard";
 
-export const statistics = [
+export const statistics: Statistic[] = [
   {
     id: 1,
     name: "Active user",
@@ -110,7 +111,7 @@ export const responsive = [
   },
 ];
 
-export const charts = [
+export const charts: Chart[] = [
   {
     id: 1,
     name: "Bar chart",

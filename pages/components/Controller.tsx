@@ -10,19 +10,24 @@ import {
 } from "antd";
 import React, { useEffect, useState } from "react";
 import { charts, grid, responsive, statistics } from "../data/data";
+import {
+  AppSettings,
+  ResponsiveBreakpoint,
+  GridOption,
+} from "@/pages/model/type";
 
 interface ControllerProps {
-  settings: any;
+  settings: AppSettings;
   currentScreen: string;
-  onSettingsChange: (settings: any) => void;
-  setSelectionType: (type: string | null) => void;
+  onSettingsChange: (settings: AppSettings) => void;
+  setSelectionType: (type: "stats" | "charts" | null) => void;
   resetStats: () => void;
   resetCharts: () => void;
   resetAll: () => void;
   onExportSettings: () => void;
 }
 
-const Controller = ({
+const Controller: React.FC<ControllerProps> = ({
   settings,
   currentScreen,
   onSettingsChange,
@@ -31,21 +36,21 @@ const Controller = ({
   resetCharts,
   resetAll,
   onExportSettings,
-}: ControllerProps) => {
-  const [activeTab, setActiveTab] = useState<string | null>(null);
+}) => {
+  const [activeTab, setActiveTab] = useState<"stats" | "charts" | null>(null);
   const [selectedComponents, setSelectedComponents] = useState<string[]>([]);
   const [selectedScreenSize, setSelectedScreenSize] =
     useState<string>("default");
   const [tempGrid, setTempGrid] = useState<number>(4);
 
-  const gridOptions = grid.map((item) => ({
+  const gridOptions: GridOption[] = grid.map((item) => ({
     value: item.value,
     label: item.title,
   }));
 
   const screenOptions = [
     { value: "default", label: "Default Settings" },
-    ...responsive.map((item) => ({
+    ...responsive.map((item: ResponsiveBreakpoint) => ({
       value: item.device,
       label: `${item.device} (${item.min}-${item.max || "∞"}px)`,
     })),
@@ -82,17 +87,19 @@ const Controller = ({
   }, [activeTab, selectedScreenSize, settings]);
 
   const handleSaveSettings = () => {
-    if (!activeTab) {
+    if (!activeTab || !selectedScreenSize) {
       message.warning("Please select both a component type and screen size");
       return;
     }
 
-    const newSettings = { ...settings };
+    const newSettings: AppSettings = { ...settings };
 
     if (selectedScreenSize === "default") {
       newSettings.default[activeTab] = {
+        ...newSettings.default[activeTab],
         visibleComponents: selectedComponents,
         defaultGrid: tempGrid,
+        // Keep existing customGrids
         customGrids: newSettings.default[activeTab].customGrids,
       };
     } else {
@@ -107,8 +114,10 @@ const Controller = ({
       }
 
       newSettings.screenSpecific[selectedScreenSize][activeTab] = {
+        ...newSettings.screenSpecific[selectedScreenSize]?.[activeTab],
         visibleComponents: selectedComponents,
         defaultGrid: tempGrid,
+        // Keep existing customGrids or initialize if not exists
         customGrids:
           newSettings.screenSpecific[selectedScreenSize]?.[activeTab]
             ?.customGrids || {},
@@ -119,6 +128,18 @@ const Controller = ({
     message.success(`Settings saved for ${selectedScreenSize}`);
     setActiveTab(null);
     setSelectionType(null);
+  };
+
+  const handleReset = (type: "stats" | "charts") => {
+    if (type === "stats") {
+      resetStats();
+      setSelectedComponents(statistics.map((s) => s.id));
+      setTempGrid(4);
+    } else {
+      resetCharts();
+      setSelectedComponents(charts.map((c) => c.id));
+      setTempGrid(12);
+    }
   };
 
   return (
@@ -143,18 +164,26 @@ const Controller = ({
             onChange={(e) => {
               setActiveTab(e.target.checked ? "stats" : null);
               setSelectionType(e.target.checked ? "stats" : null);
+              // Initialize with all stats components when selected
+              setSelectedComponents(statistics.map((s) => s.id));
+              setTempGrid(4);
             }}
           >
             Statistics
           </Checkbox>
-          {/* <Button
+          <Button
             type="link"
-            onClick={resetStats}
+            onClick={() => {
+              resetStats();
+              // Force update UI to show all stats immediately
+              setSelectedComponents(statistics.map((s) => s.id));
+              setTempGrid(4);
+            }}
             style={{ marginLeft: 8 }}
             danger
           >
             Reset Stats
-          </Button> */}
+          </Button>
         </Col>
         <Col span={12}>
           <Checkbox
@@ -162,18 +191,26 @@ const Controller = ({
             onChange={(e) => {
               setActiveTab(e.target.checked ? "charts" : null);
               setSelectionType(e.target.checked ? "charts" : null);
+              // Initialize with all charts components when selected
+              setSelectedComponents(charts.map((c) => c.id));
+              setTempGrid(12);
             }}
           >
             Charts
           </Checkbox>
-          {/* <Button
+          <Button
             type="link"
-            onClick={resetCharts}
+            onClick={() => {
+              resetCharts();
+              // Force update UI to show all charts immediately
+              setSelectedComponents(charts.map((c) => c.id));
+              setTempGrid(12);
+            }}
             style={{ marginLeft: 8 }}
             danger
           >
             Reset Charts
-          </Button> */}
+          </Button>
         </Col>
 
         <Col span={24}>
