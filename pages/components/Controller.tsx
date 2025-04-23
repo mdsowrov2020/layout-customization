@@ -181,39 +181,39 @@ import React, { useEffect, useState } from "react";
 import { charts, grid, responsive, statistics } from "../data/data";
 
 interface ControllerProps {
-  setStatsGrid: (value: number) => void;
-  setChartsGrid: (value: number) => void;
+  setDefaultStatsGrid: (value: number) => void;
+  setDefaultChartsGrid: (value: number) => void;
   setVisibleStats: (ids: string[]) => void;
   setVisibleCharts: (ids: string[]) => void;
   setScreenSize: (size: { min: number; max: number | null } | null) => void;
   setSelectionType: (type: string | null) => void;
   visibleStats: string[];
   visibleCharts: string[];
-  statsGrid: number;
-  chartsGrid: number;
+  defaultStatsGrid: number;
+  defaultChartsGrid: number;
   resetStats: () => void;
   resetCharts: () => void;
 }
 
 const Controller = ({
-  setStatsGrid,
-  setChartsGrid,
+  setDefaultStatsGrid,
+  setDefaultChartsGrid,
   setVisibleStats,
   setVisibleCharts,
   setScreenSize,
   setSelectionType,
   visibleStats,
   visibleCharts,
-  statsGrid,
-  chartsGrid,
+  defaultStatsGrid,
+  defaultChartsGrid,
   resetStats,
   resetCharts,
 }: ControllerProps) => {
   const [activeTab, setActiveTab] = useState<string | null>(null);
   const [selectedComponents, setSelectedComponents] = useState<string[]>([]);
   const [selectedScreen, setSelectedScreen] = useState<string | null>(null);
-  const [tempStatsGrid, setTempStatsGrid] = useState(statsGrid);
-  const [tempChartsGrid, setTempChartsGrid] = useState(chartsGrid);
+  const [tempStatsGrid, setTempStatsGrid] = useState(defaultStatsGrid);
+  const [tempChartsGrid, setTempChartsGrid] = useState(defaultChartsGrid);
 
   const gridOptions = grid.map((item) => ({
     value: item.value,
@@ -238,10 +238,10 @@ const Controller = ({
   useEffect(() => {
     if (activeTab === "stats") {
       setSelectedComponents(visibleStats);
-      setTempStatsGrid(statsGrid);
+      setTempStatsGrid(defaultStatsGrid);
     } else if (activeTab === "charts") {
       setSelectedComponents(visibleCharts);
-      setTempChartsGrid(chartsGrid);
+      setTempChartsGrid(defaultChartsGrid);
     }
   }, [activeTab, visibleStats, visibleCharts]);
 
@@ -257,7 +257,7 @@ const Controller = ({
           ? selectedComponents
           : statistics.map((s) => s.id)
       );
-      setStatsGrid(tempStatsGrid);
+      setDefaultStatsGrid(tempStatsGrid);
       message.success(`Statistics settings saved with grid ${tempStatsGrid}`);
     } else {
       setVisibleCharts(
@@ -265,7 +265,7 @@ const Controller = ({
           ? selectedComponents
           : charts.map((c) => c.id)
       );
-      setChartsGrid(tempChartsGrid);
+      setDefaultChartsGrid(tempChartsGrid);
       message.success(`Charts settings saved with grid ${tempChartsGrid}`);
     }
 

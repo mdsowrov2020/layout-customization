@@ -4,8 +4,8 @@ import { statistics, charts } from "@/pages/data/data";
 import CustomGridSelect from "./CustomGridSelect";
 
 interface MainProps {
-  statsGrid: number;
-  chartsGrid: number;
+  defaultStatsGrid: number;
+  defaultChartsGrid: number;
   visibleStats: string[];
   visibleCharts: string[];
   screenSize: { min: number; max: number | null } | null;
@@ -14,8 +14,8 @@ interface MainProps {
 }
 
 const Main = ({
-  statsGrid,
-  chartsGrid,
+  defaultStatsGrid,
+  defaultChartsGrid,
   visibleStats,
   visibleCharts,
   screenSize,
@@ -51,10 +51,10 @@ const Main = ({
       const newChartsGrids = { ...chartsGrids };
 
       Object.keys(newStatsGrids).forEach((id) => {
-        newStatsGrids[id] = statsGrid;
+        newStatsGrids[id] = defaultStatsGrid;
       });
       Object.keys(newChartsGrids).forEach((id) => {
-        newChartsGrids[id] = chartsGrid;
+        newChartsGrids[id] = defaultChartsGrid;
       });
 
       setStatsGrids(newStatsGrids);
@@ -67,7 +67,7 @@ const Main = ({
     };
 
     resetIndividualGrids();
-  }, [statsGrid, chartsGrid]);
+  }, [defaultStatsGrid, defaultChartsGrid]);
 
   const handleCardClick = (id: string, type: "stats" | "charts") => {
     if (!selectionType || selectionType === type) {
@@ -99,12 +99,12 @@ const Main = ({
         settings: {
           stats: {
             visibleComponents: visibleStats,
-            defaultGrid: statsGrid,
+            defaultGrid: defaultStatsGrid,
             customGrids: statsGrids,
           },
           charts: {
             visibleComponents: visibleCharts,
-            defaultGrid: chartsGrid,
+            defaultGrid: defaultChartsGrid,
             customGrids: chartsGrids,
           },
           screenSize: screenSize,
@@ -143,7 +143,8 @@ const Main = ({
               selectedCard?.id === card.id && selectedCard.type === type;
             const isEditable = !selectionType || selectionType === type;
             const gridValue =
-              grids[card.id] || (type === "stats" ? statsGrid : chartsGrid);
+              grids[card.id] ||
+              (type === "stats" ? defaultStatsGrid : defaultChartsGrid);
 
             return (
               <Col
@@ -183,8 +184,8 @@ const Main = ({
   return (
     <Card>
       <Typography.Title level={4} style={{ marginBottom: 16 }}>
-        Admin Panel Preview —<strong> Stats Grid:</strong> {statsGrid} |
-        <strong> Charts Grid:</strong> {chartsGrid}
+        Admin Panel Preview —<strong> Stats Grid:</strong> {defaultStatsGrid} |
+        <strong> Charts Grid:</strong> {defaultChartsGrid}
         {selectionType && (
           <Typography.Text type="secondary" style={{ marginLeft: 8 }}>
             (Editing: {selectionType})

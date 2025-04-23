@@ -11,8 +11,8 @@ export default function Home() {
   const [visibleCharts, setVisibleCharts] = useState<string[]>(
     charts.map((c) => c.id)
   );
-  const [statsGrid, setStatsGrid] = useState<number>(4);
-  const [chartsGrid, setChartsGrid] = useState<number>(12);
+  const [defaultStatsGrid, setDefaultStatsGrid] = useState<number>(4);
+  const [defaultChartsGrid, setDefaultChartsGrid] = useState<number>(12);
   const [screenSize, setScreenSize] = useState<{
     min: number;
     max: number | null;
@@ -22,14 +22,14 @@ export default function Home() {
 
   const resetStats = () => {
     setVisibleStats(statistics.map((s) => s.id));
-    setStatsGrid(4);
+    setDefaultStatsGrid(4);
     localStorage.removeItem("statsGridSettings");
     setSelectionType(null);
   };
 
   const resetCharts = () => {
     setVisibleCharts(charts.map((c) => c.id));
-    setChartsGrid(12);
+    setDefaultChartsGrid(12);
     localStorage.removeItem("chartsGridSettings");
     setSelectionType(null);
   };
@@ -58,22 +58,22 @@ export default function Home() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "50px" }}>
       <Controller
-        setStatsGrid={setStatsGrid}
-        setChartsGrid={setChartsGrid}
+        setDefaultStatsGrid={setDefaultStatsGrid}
+        setDefaultChartsGrid={setDefaultChartsGrid}
         setVisibleStats={setVisibleStats}
         setVisibleCharts={setVisibleCharts}
         setScreenSize={setScreenSize}
         setSelectionType={setSelectionType}
         visibleStats={visibleStats}
         visibleCharts={visibleCharts}
-        statsGrid={statsGrid}
-        chartsGrid={chartsGrid}
+        defaultStatsGrid={defaultStatsGrid}
+        defaultChartsGrid={defaultChartsGrid}
         resetStats={resetStats}
         resetCharts={resetCharts}
       />
       <Main
-        statsGrid={statsGrid}
-        chartsGrid={chartsGrid}
+        defaultStatsGrid={defaultStatsGrid}
+        defaultChartsGrid={defaultChartsGrid}
         visibleStats={visibleStats}
         visibleCharts={visibleCharts}
         screenSize={screenSize}
