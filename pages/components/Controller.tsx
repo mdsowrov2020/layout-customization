@@ -38,7 +38,7 @@ const Controller: React.FC<ControllerProps> = ({
   onExportSettings,
 }) => {
   const [activeTab, setActiveTab] = useState<"stats" | "charts" | null>(null);
-  const [selectedComponents, setSelectedComponents] = useState<number[]>([]); // Changed to number[]
+  const [selectedComponents, setSelectedComponents] = useState<number[]>([]);
   const [selectedScreenSize, setSelectedScreenSize] =
     useState<string>("default");
   const [tempGrid, setTempGrid] = useState<number>(4);
@@ -47,7 +47,7 @@ const Controller: React.FC<ControllerProps> = ({
     id: item.id,
     value: item.value,
     title: item.title,
-    label: item.title, // Optional, for Select components
+    label: item.title,
   }));
 
   const screenOptions = [
@@ -101,7 +101,6 @@ const Controller: React.FC<ControllerProps> = ({
         ...newSettings.default[activeTab],
         visibleComponents: selectedComponents,
         defaultGrid: tempGrid,
-        // Keep existing customGrids
         customGrids: newSettings.default[activeTab].customGrids,
       };
     } else {
@@ -119,7 +118,6 @@ const Controller: React.FC<ControllerProps> = ({
         ...newSettings.screenSpecific[selectedScreenSize]?.[activeTab],
         visibleComponents: selectedComponents,
         defaultGrid: tempGrid,
-        // Keep existing customGrids or initialize if not exists
         customGrids:
           newSettings.screenSpecific[selectedScreenSize]?.[activeTab]
             ?.customGrids || {},
@@ -166,7 +164,6 @@ const Controller: React.FC<ControllerProps> = ({
             onChange={(e) => {
               setActiveTab(e.target.checked ? "stats" : null);
               setSelectionType(e.target.checked ? "stats" : null);
-              // Initialize with all stats components when selected
               setSelectedComponents(statistics.map((s) => s.id));
               setTempGrid(4);
             }}
@@ -177,7 +174,6 @@ const Controller: React.FC<ControllerProps> = ({
             type="link"
             onClick={() => {
               resetStats();
-              // Force update UI to show all stats immediately
               setSelectedComponents(statistics.map((s) => s.id));
               setTempGrid(4);
             }}
@@ -193,7 +189,6 @@ const Controller: React.FC<ControllerProps> = ({
             onChange={(e) => {
               setActiveTab(e.target.checked ? "charts" : null);
               setSelectionType(e.target.checked ? "charts" : null);
-              // Initialize with all charts components when selected
               setSelectedComponents(charts.map((c) => c.id));
               setTempGrid(12);
             }}
@@ -204,7 +199,6 @@ const Controller: React.FC<ControllerProps> = ({
             type="link"
             onClick={() => {
               resetCharts();
-              // Force update UI to show all charts immediately
               setSelectedComponents(charts.map((c) => c.id));
               setTempGrid(12);
             }}

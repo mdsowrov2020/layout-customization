@@ -5,28 +5,33 @@ import CustomGridSelect from "./CustomGridSelect";
 import { GridSettings } from "../../lib/model/type";
 
 interface MainProps {
-  activeSettings: {
-    stats: {
-      visibleComponents: number[];
-      defaultGrid: number;
-      customGrids: Record<number, number>;
-    };
-    charts: {
-      visibleComponents: number[];
-      defaultGrid: number;
-      customGrids: Record<number, number>;
-    };
+  activeSettings?: {
+    stats: GridSettings;
+    charts: GridSettings;
   };
-  selectionType: "stats" | "charts" | null;
-  currentScreen: string;
-  onGridChange: (type: "stats" | "charts", id: number, value: number) => void;
+  selectionType?: "stats" | "charts" | null;
+  currentScreen?: string;
+  onGridChange?: (type: "stats" | "charts", id: number, value: number) => void;
 }
 
+const defaultSettings = {
+  stats: {
+    visibleComponents: [] as number[],
+    defaultGrid: 4,
+    customGrids: {} as Record<number, number>,
+  },
+  charts: {
+    visibleComponents: [] as number[],
+    defaultGrid: 12,
+    customGrids: {} as Record<number, number>,
+  },
+};
+
 const Main: React.FC<MainProps> = ({
-  activeSettings,
-  selectionType,
-  currentScreen,
-  onGridChange,
+  activeSettings = defaultSettings,
+  selectionType = null,
+  currentScreen = "desktop",
+  onGridChange = () => {},
 }) => {
   const [selectedCard, setSelectedCard] = useState<{
     id: number;
@@ -52,11 +57,11 @@ const Main: React.FC<MainProps> = ({
     title: string,
     type: "stats" | "charts"
   ) => {
-    // Safely get visibleComponents with fallback to empty array
-    const visibleComponents = activeSettings[type]?.visibleComponents || [];
-    const defaultGrid =
-      activeSettings[type]?.defaultGrid || (type === "stats" ? 4 : 12);
-    const customGrids = activeSettings[type]?.customGrids || {};
+    const {
+      visibleComponents = [],
+      defaultGrid = type === "stats" ? 4 : 12,
+      customGrids = {},
+    } = activeSettings[type] || {};
 
     const visibleCards = cards.filter((card) =>
       visibleComponents.includes(card.id)
