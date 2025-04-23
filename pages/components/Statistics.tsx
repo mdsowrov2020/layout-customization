@@ -1,12 +1,23 @@
 import { Col } from "antd";
 import React from "react";
 
-const Statistics = ({ filterCard, handleClick }) => {
+interface Card {
+  id: number;
+  grid: number;
+  component: React.ReactNode;
+}
+
+interface StatisticsProps {
+  filterCard: Card[];
+  handleClick: (id: number) => void;
+}
+
+const Statistics: React.FC<StatisticsProps> = ({ filterCard, handleClick }) => {
   return (
     <>
       {filterCard.map((card) => (
         <Col
-          // span={cardColumnMap[card.id] || showColumn}
+          key={card.id}
           span={card.grid}
           onClick={() => handleClick(card.id)}
         >
