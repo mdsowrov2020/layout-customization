@@ -27,7 +27,8 @@ const nextConfig = {
     "rc-field-form",
     "rc-trigger",
     "rc-dialog",
-    "rc-input", // 👈 ADD THIS!!
+    "rc-input",
+    "rc-checkbox",
     "@babel/runtime",
   ],
 };

@@ -1,21 +1,90 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import Controller from "./components/Controller";
 import Main from "./components/Main";
-import { grid } from "./data/data";
+import { statistics, charts } from "@/pages/data/data";
+import { Card } from "antd";
 
 export default function Home() {
-  const [showCard, setShowCard] = useState(null);
-  const [showColumn, setShowColumn] = useState(4);
-  console.log("From index: ", showColumn);
+  const [visibleStats, setVisibleStats] = useState<string[]>(
+    statistics.map((s) => s.id)
+  );
+  const [visibleCharts, setVisibleCharts] = useState<string[]>(
+    charts.map((c) => c.id)
+  );
+  const [statsGrid, setStatsGrid] = useState<number>(4);
+  const [chartsGrid, setChartsGrid] = useState<number>(12);
+  const [screenSize, setScreenSize] = useState<{
+    min: number;
+    max: number | null;
+  } | null>(null);
+  const [selectionType, setSelectionType] = useState<string | null>(null);
+  const [jsonSettings, setJsonSettings] = useState<string>("");
 
-  //  Update grid
+  const resetStats = () => {
+    setVisibleStats(statistics.map((s) => s.id));
+    setStatsGrid(4);
+    localStorage.removeItem("statsGridSettings");
+    setSelectionType(null);
+  };
+
+  const resetCharts = () => {
+    setVisibleCharts(charts.map((c) => c.id));
+    setChartsGrid(12);
+    localStorage.removeItem("chartsGridSettings");
+    setSelectionType(null);
+  };
+
+  const handleExportSettings = (json: string) => {
+    setJsonSettings(json);
+  };
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (screenSize) {
+        const width = window.innerWidth;
+        if (
+          width < screenSize.min ||
+          (screenSize.max && width > screenSize.max)
+        ) {
+          console.warn("Window size outside selected screen range");
+        }
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [screenSize]);
 
   return (
-    <>
-      <div style={{ display: "flex", flexDirection: "column", gap: "50px" }}>
-        <Controller setShowColumn={setShowColumn} setShowCard={setShowCard} />
-        <Main showColumn={showColumn} showCard={showCard} />
-      </div>
-    </>
+    <div style={{ display: "flex", flexDirection: "column", gap: "50px" }}>
+      <Controller
+        setStatsGrid={setStatsGrid}
+        setChartsGrid={setChartsGrid}
+        setVisibleStats={setVisibleStats}
+        setVisibleCharts={setVisibleCharts}
+        setScreenSize={setScreenSize}
+        setSelectionType={setSelectionType}
+        visibleStats={visibleStats}
+        visibleCharts={visibleCharts}
+        statsGrid={statsGrid}
+        chartsGrid={chartsGrid}
+        resetStats={resetStats}
+        resetCharts={resetCharts}
+      />
+      <Main
+        statsGrid={statsGrid}
+        chartsGrid={chartsGrid}
+        visibleStats={visibleStats}
+        visibleCharts={visibleCharts}
+        screenSize={screenSize}
+        selectionType={selectionType}
+        onExportSettings={handleExportSettings}
+      />
+      {jsonSettings && (
+        <Card title="Current Settings JSON">
+          <pre>{jsonSettings}</pre>
+        </Card>
+      )}
+    </div>
   );
 }

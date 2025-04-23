@@ -1,3 +1,6 @@
+import BarChartLib from "../components/BarChartLib";
+import ComposeChart from "../components/ComposeChart";
+import PieChartLib from "../components/PieChartLib";
 import ActiveUserCard from "../ui/ActiveUserCard";
 import FreeUserCard from "../ui/FreeUserCard";
 import StatisticCard from "../ui/StatisticCard";
@@ -70,5 +73,60 @@ export const grid = [
     id: 5,
     value: 4,
     title: "Grid : 4",
+  },
+];
+
+export const responsive = [
+  {
+    id: 1,
+    device: "Extra small",
+    min: 0,
+    max: 576,
+  },
+  {
+    id: 2,
+    device: "Small",
+    min: 576,
+    max: 768,
+  },
+
+  {
+    id: 3,
+    device: "Medium",
+    min: 768,
+    max: 992,
+  },
+  {
+    id: 4,
+    device: "Large",
+    min: 992,
+    max: 1200,
+  },
+  {
+    id: 5,
+    device: "Extra large",
+    min: 1400,
+    max: null,
+  },
+];
+
+export const charts = [
+  {
+    id: 1,
+    name: "Bar chart",
+    grid: 8,
+    component: <BarChartLib />,
+  },
+  {
+    id: 2,
+    name: "Compose chart",
+    grid: 8,
+    component: <ComposeChart />,
+  },
+  {
+    id: 3,
+    name: "Pie chart",
+    grid: 8,
+    component: <PieChartLib />,
   },
 ];

@@ -2,11 +2,22 @@ import React from "react";
 import { grid } from "../data/data";
 import { Select, Typography } from "antd";
 
-const CustomGridSelect = ({ selectedCardId, currentValue, onChange }) => {
+interface CustomGridSelectProps {
+  selectedCardId: string;
+  currentValue: number;
+  onChange: (value: number) => void;
+}
+
+const CustomGridSelect: React.FC<CustomGridSelectProps> = ({
+  selectedCardId,
+  currentValue,
+  onChange,
+}) => {
   const gridOptions = grid.map((val) => ({
     label: `${val.title}`,
     value: val.value,
   }));
+
   return (
     <div style={{ marginTop: 16, marginBottom: 16 }}>
       <Typography.Text strong>
