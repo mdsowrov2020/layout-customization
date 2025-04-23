@@ -1,17 +1,17 @@
 import React from "react";
-import { grid } from "../data/data";
 import { Select, Typography } from "antd";
+import { grid } from "../data/data";
 
 interface CustomGridSelectProps {
-  selectedCardId: string;
   currentValue: number;
   onChange: (value: number) => void;
+  selectedCardId: string;
 }
 
 const CustomGridSelect: React.FC<CustomGridSelectProps> = ({
-  selectedCardId,
   currentValue,
   onChange,
+  selectedCardId,
 }) => {
   const gridOptions = grid.map((val) => ({
     label: `${val.title}`,

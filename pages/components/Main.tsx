@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Card, Col, Row, Typography, Button } from "antd";
+import React, { useState } from "react";
+import { Card, Col, Row, Typography } from "antd";
 import { statistics, charts } from "@/pages/data/data";
 import CustomGridSelect from "./CustomGridSelect";
 

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import Controller from "./components/Controller";
 import Main from "./components/Main";
 import { statistics, charts, responsive } from "@/pages/data/data";
-import { Card } from "antd";
+import { Card, message } from "antd";
 
 interface ScreenSettings {
   min: number;
@@ -36,7 +36,7 @@ interface AppSettings {
 }
 
 export default function Home() {
-  const [settings, setSettings] = useState<AppSettings>({
+  const defaultSettings = {
     default: {
       stats: {
         visibleComponents: statistics.map((s) => s.id),
@@ -50,13 +50,15 @@ export default function Home() {
       },
     },
     screenSpecific: {},
-  });
+  };
 
+  const [settings, setSettings] = useState<AppSettings>(
+    JSON.parse(JSON.stringify(defaultSettings))
+  );
   const [currentScreen, setCurrentScreen] = useState<string>("desktop");
   const [jsonSettings, setJsonSettings] = useState<string>("");
   const [selectionType, setSelectionType] = useState<string | null>(null);
 
-  // Detect screen size changes
   useEffect(() => {
     const handleResize = () => {
       const width = window.innerWidth;
@@ -67,11 +69,10 @@ export default function Home() {
     };
 
     window.addEventListener("resize", handleResize);
-    handleResize(); // Initial detection
+    handleResize();
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Get active settings for current screen
   const getActiveSettings = () => {
     const screenConfig = settings.screenSpecific[currentScreen] || {};
     return {
@@ -104,7 +105,6 @@ export default function Home() {
     setSettings((prev) => {
       const newSettings = { ...prev };
 
-      // Update for current screen if it has specific settings
       if (newSettings.screenSpecific[currentScreen]?.[type]) {
         newSettings.screenSpecific[currentScreen][type] = {
           ...newSettings.screenSpecific[currentScreen][type],
@@ -114,12 +114,18 @@ export default function Home() {
           },
         };
       } else {
-        // Update default settings
         newSettings.default[type].customGrids[id] = value;
       }
 
       return newSettings;
     });
+  };
+
+  const resetAllSettings = () => {
+    setSettings(JSON.parse(JSON.stringify(defaultSettings)));
+    setSelectionType(null);
+    message.success("All settings reset to default");
+    setJsonSettings(""); // Clear JSON preview
   };
 
   const resetStats = () => {
@@ -133,8 +139,23 @@ export default function Home() {
           customGrids: {},
         },
       },
+      screenSpecific: Object.fromEntries(
+        Object.entries(prev.screenSpecific).map(([key, value]) => [
+          key,
+          {
+            ...value,
+            stats: value.stats
+              ? {
+                  ...value.stats,
+                  customGrids: {},
+                }
+              : undefined,
+          },
+        ])
+      ),
     }));
     setSelectionType(null);
+    message.success("Statistics settings reset to default");
   };
 
   const resetCharts = () => {
@@ -148,8 +169,23 @@ export default function Home() {
           customGrids: {},
         },
       },
+      screenSpecific: Object.fromEntries(
+        Object.entries(prev.screenSpecific).map(([key, value]) => [
+          key,
+          {
+            ...value,
+            charts: value.charts
+              ? {
+                  ...value.charts,
+                  customGrids: {},
+                }
+              : undefined,
+          },
+        ])
+      ),
     }));
     setSelectionType(null);
+    message.success("Charts settings reset to default");
   };
 
   const handleExportSettings = () => {
@@ -165,6 +201,7 @@ export default function Home() {
         setSelectionType={setSelectionType}
         resetStats={resetStats}
         resetCharts={resetCharts}
+        resetAll={resetAllSettings}
         onExportSettings={handleExportSettings}
       />
       <Main

@@ -1,11 +1,11 @@
 import {
+  Button,
   Card,
   Checkbox,
   Col,
   Row,
   Select,
   Typography,
-  Button,
   message,
 } from "antd";
 import React, { useEffect, useState } from "react";
@@ -18,6 +18,7 @@ interface ControllerProps {
   setSelectionType: (type: string | null) => void;
   resetStats: () => void;
   resetCharts: () => void;
+  resetAll: () => void;
   onExportSettings: () => void;
 }
 
@@ -28,13 +29,13 @@ const Controller = ({
   setSelectionType,
   resetStats,
   resetCharts,
+  resetAll,
   onExportSettings,
 }: ControllerProps) => {
   const [activeTab, setActiveTab] = useState<string | null>(null);
   const [selectedComponents, setSelectedComponents] = useState<string[]>([]);
-  const [selectedScreenSize, setSelectedScreenSize] = useState<string | null>(
-    null
-  );
+  const [selectedScreenSize, setSelectedScreenSize] =
+    useState<string>("default");
   const [tempGrid, setTempGrid] = useState<number>(4);
 
   const gridOptions = grid.map((item) => ({
@@ -81,7 +82,7 @@ const Controller = ({
   }, [activeTab, selectedScreenSize, settings]);
 
   const handleSaveSettings = () => {
-    if (!activeTab || !selectedScreenSize) {
+    if (!activeTab) {
       message.warning("Please select both a component type and screen size");
       return;
     }
@@ -89,13 +90,12 @@ const Controller = ({
     const newSettings = { ...settings };
 
     if (selectedScreenSize === "default") {
-      // Update default settings
       newSettings.default[activeTab] = {
         visibleComponents: selectedComponents,
         defaultGrid: tempGrid,
+        customGrids: newSettings.default[activeTab].customGrids,
       };
     } else {
-      // Update screen-specific settings
       if (!newSettings.screenSpecific[selectedScreenSize]) {
         const screenConfig = responsive.find(
           (r) => r.device === selectedScreenSize
@@ -109,6 +109,9 @@ const Controller = ({
       newSettings.screenSpecific[selectedScreenSize][activeTab] = {
         visibleComponents: selectedComponents,
         defaultGrid: tempGrid,
+        customGrids:
+          newSettings.screenSpecific[selectedScreenSize]?.[activeTab]
+            ?.customGrids || {},
       };
     }
 
@@ -124,6 +127,14 @@ const Controller = ({
         <Col span={24}>
           <Typography.Title level={5}>Component Selector</Typography.Title>
           <Typography.Text>Current Screen: {currentScreen}</Typography.Text>
+          <Button
+            type="link"
+            onClick={resetAll}
+            style={{ marginLeft: 16 }}
+            danger
+          >
+            Reset All Settings
+          </Button>
         </Col>
 
         <Col span={12}>
@@ -136,9 +147,14 @@ const Controller = ({
           >
             Statistics
           </Checkbox>
-          <Button type="link" onClick={resetStats} style={{ marginLeft: 8 }}>
+          {/* <Button
+            type="link"
+            onClick={resetStats}
+            style={{ marginLeft: 8 }}
+            danger
+          >
             Reset Stats
-          </Button>
+          </Button> */}
         </Col>
         <Col span={12}>
           <Checkbox
@@ -150,9 +166,14 @@ const Controller = ({
           >
             Charts
           </Checkbox>
-          <Button type="link" onClick={resetCharts} style={{ marginLeft: 8 }}>
+          {/* <Button
+            type="link"
+            onClick={resetCharts}
+            style={{ marginLeft: 8 }}
+            danger
+          >
             Reset Charts
-          </Button>
+          </Button> */}
         </Col>
 
         <Col span={24}>
