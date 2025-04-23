@@ -37,6 +37,8 @@ export interface GridOption {
   id: number;
   value: number;
   title: string;
+  // Add label if needed for Select components
+  label?: string;
 }
 
 export interface ResponsiveBreakpoint {

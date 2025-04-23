@@ -1,7 +1,7 @@
 import BarChartLib from "../components/BarChartLib";
 import ComposeChart from "../components/ComposeChart";
 import PieChartLib from "../components/PieChartLib";
-import { Chart, Statistic } from "../model/type";
+import { Chart, GridOption, Statistic } from "../model/type";
 import ActiveUserCard from "../ui/ActiveUserCard";
 import FreeUserCard from "../ui/FreeUserCard";
 import StatisticCard from "../ui/StatisticCard";
@@ -48,7 +48,7 @@ export const statistics: Statistic[] = [
   },
 ];
 
-export const grid = [
+export const grid: GridOption[] = [
   {
     id: 2,
     value: 24,

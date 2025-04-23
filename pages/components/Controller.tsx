@@ -38,14 +38,16 @@ const Controller: React.FC<ControllerProps> = ({
   onExportSettings,
 }) => {
   const [activeTab, setActiveTab] = useState<"stats" | "charts" | null>(null);
-  const [selectedComponents, setSelectedComponents] = useState<string[]>([]);
+  const [selectedComponents, setSelectedComponents] = useState<number[]>([]); // Changed to number[]
   const [selectedScreenSize, setSelectedScreenSize] =
     useState<string>("default");
   const [tempGrid, setTempGrid] = useState<number>(4);
 
   const gridOptions: GridOption[] = grid.map((item) => ({
+    id: item.id,
     value: item.value,
-    label: item.title,
+    title: item.title,
+    label: item.title, // Optional, for Select components
   }));
 
   const screenOptions = [

@@ -2,16 +2,24 @@ import React, { useState } from "react";
 import { Card, Col, Row, Typography } from "antd";
 import { statistics, charts } from "@/pages/data/data";
 import CustomGridSelect from "./CustomGridSelect";
-import { GridSettings } from "../types";
+import { GridSettings } from "../model/type";
 
 interface MainProps {
   activeSettings: {
-    stats: GridSettings;
-    charts: GridSettings;
+    stats: {
+      visibleComponents: number[];
+      defaultGrid: number;
+      customGrids: Record<number, number>;
+    };
+    charts: {
+      visibleComponents: number[];
+      defaultGrid: number;
+      customGrids: Record<number, number>;
+    };
   };
   selectionType: "stats" | "charts" | null;
   currentScreen: string;
-  onGridChange: (type: "stats" | "charts", id: string, value: number) => void;
+  onGridChange: (type: "stats" | "charts", id: number, value: number) => void;
 }
 
 const Main: React.FC<MainProps> = ({
@@ -21,11 +29,11 @@ const Main: React.FC<MainProps> = ({
   onGridChange,
 }) => {
   const [selectedCard, setSelectedCard] = useState<{
-    id: string;
+    id: number;
     type: "stats" | "charts";
   } | null>(null);
 
-  const handleCardClick = (id: string, type: "stats" | "charts") => {
+  const handleCardClick = (id: number, type: "stats" | "charts") => {
     if (!selectionType || selectionType === type) {
       setSelectedCard((prev) =>
         prev?.id === id && prev.type === type ? null : { id, type }
@@ -89,7 +97,7 @@ const Main: React.FC<MainProps> = ({
                     <CustomGridSelect
                       currentValue={gridValue}
                       onChange={handleLayoutChange}
-                      selectedCardId={card.id}
+                      selectedCardId={card.id.toString()}
                     />
                   </div>
                 )}
