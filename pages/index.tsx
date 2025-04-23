@@ -1,84 +1,134 @@
 import { useState, useEffect } from "react";
 import Controller from "./components/Controller";
 import Main from "./components/Main";
-import { statistics, charts } from "@/pages/data/data";
+import { statistics, charts, responsive } from "@/pages/data/data";
 import { Card } from "antd";
 
+interface ScreenSettings {
+  min: number;
+  max: number | null;
+  stats?: {
+    visibleComponents?: string[];
+    defaultGrid?: number;
+  };
+  charts?: {
+    visibleComponents?: string[];
+    defaultGrid?: number;
+  };
+}
+
+interface AppSettings {
+  default: {
+    stats: {
+      visibleComponents: string[];
+      defaultGrid: number;
+    };
+    charts: {
+      visibleComponents: string[];
+      defaultGrid: number;
+    };
+  };
+  screenSpecific: Record<string, ScreenSettings>;
+}
+
 export default function Home() {
-  const [visibleStats, setVisibleStats] = useState<string[]>(
-    statistics.map((s) => s.id)
-  );
-  const [visibleCharts, setVisibleCharts] = useState<string[]>(
-    charts.map((c) => c.id)
-  );
-  const [defaultStatsGrid, setDefaultStatsGrid] = useState<number>(4);
-  const [defaultChartsGrid, setDefaultChartsGrid] = useState<number>(12);
-  const [screenSize, setScreenSize] = useState<{
-    min: number;
-    max: number | null;
-  } | null>(null);
-  const [selectionType, setSelectionType] = useState<string | null>(null);
+  const [settings, setSettings] = useState<AppSettings>({
+    default: {
+      stats: {
+        visibleComponents: statistics.map((s) => s.id),
+        defaultGrid: 4,
+      },
+      charts: {
+        visibleComponents: charts.map((c) => c.id),
+        defaultGrid: 12,
+      },
+    },
+    screenSpecific: {},
+  });
+
+  const [currentScreen, setCurrentScreen] = useState<string>("desktop");
   const [jsonSettings, setJsonSettings] = useState<string>("");
+  const [selectionType, setSelectionType] = useState<string | null>(null);
+
+  // Detect screen size changes
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      const screen =
+        responsive.find((r) => width >= r.min && (!r.max || width <= r.max))
+          ?.device || "desktop";
+      setCurrentScreen(screen);
+    };
+
+    window.addEventListener("resize", handleResize);
+    handleResize(); // Initial detection
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Get active settings for current screen
+  const getActiveSettings = () => {
+    const screenConfig = settings.screenSpecific[currentScreen] || {};
+    return {
+      stats: {
+        ...settings.default.stats,
+        ...(screenConfig.stats || {}),
+      },
+      charts: {
+        ...settings.default.charts,
+        ...(screenConfig.charts || {}),
+      },
+    };
+  };
+
+  const activeSettings = getActiveSettings();
 
   const resetStats = () => {
-    setVisibleStats(statistics.map((s) => s.id));
-    setDefaultStatsGrid(4);
-    localStorage.removeItem("statsGridSettings");
+    setSettings((prev) => ({
+      ...prev,
+      default: {
+        ...prev.default,
+        stats: {
+          visibleComponents: statistics.map((s) => s.id),
+          defaultGrid: 4,
+        },
+      },
+    }));
     setSelectionType(null);
   };
 
   const resetCharts = () => {
-    setVisibleCharts(charts.map((c) => c.id));
-    setDefaultChartsGrid(12);
-    localStorage.removeItem("chartsGridSettings");
+    setSettings((prev) => ({
+      ...prev,
+      default: {
+        ...prev.default,
+        charts: {
+          visibleComponents: charts.map((c) => c.id),
+          defaultGrid: 12,
+        },
+      },
+    }));
     setSelectionType(null);
   };
 
-  const handleExportSettings = (json: string) => {
-    setJsonSettings(json);
+  const handleExportSettings = () => {
+    setJsonSettings(JSON.stringify(settings, null, 2));
   };
-
-  useEffect(() => {
-    const handleResize = () => {
-      if (screenSize) {
-        const width = window.innerWidth;
-        if (
-          width < screenSize.min ||
-          (screenSize.max && width > screenSize.max)
-        ) {
-          console.warn("Window size outside selected screen range");
-        }
-      }
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, [screenSize]);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "50px" }}>
       <Controller
-        setDefaultStatsGrid={setDefaultStatsGrid}
-        setDefaultChartsGrid={setDefaultChartsGrid}
-        setVisibleStats={setVisibleStats}
-        setVisibleCharts={setVisibleCharts}
-        setScreenSize={setScreenSize}
+        settings={settings}
+        currentScreen={currentScreen}
+        onSettingsChange={setSettings}
         setSelectionType={setSelectionType}
-        visibleStats={visibleStats}
-        visibleCharts={visibleCharts}
-        defaultStatsGrid={defaultStatsGrid}
-        defaultChartsGrid={defaultChartsGrid}
         resetStats={resetStats}
         resetCharts={resetCharts}
+        onExportSettings={handleExportSettings}
       />
       <Main
-        defaultStatsGrid={defaultStatsGrid}
-        defaultChartsGrid={defaultChartsGrid}
-        visibleStats={visibleStats}
-        visibleCharts={visibleCharts}
-        screenSize={screenSize}
+        activeSettings={activeSettings}
         selectionType={selectionType}
-        onExportSettings={handleExportSettings}
+        currentScreen={currentScreen}
       />
       {jsonSettings && (
         <Card title="Current Settings JSON">

@@ -4,24 +4,21 @@ import { statistics, charts } from "@/pages/data/data";
 import CustomGridSelect from "./CustomGridSelect";
 
 interface MainProps {
-  defaultStatsGrid: number;
-  defaultChartsGrid: number;
-  visibleStats: string[];
-  visibleCharts: string[];
-  screenSize: { min: number; max: number | null } | null;
+  activeSettings: {
+    stats: {
+      visibleComponents: string[];
+      defaultGrid: number;
+    };
+    charts: {
+      visibleComponents: string[];
+      defaultGrid: number;
+    };
+  };
   selectionType: string | null;
-  onExportSettings: (json: string) => void;
+  currentScreen: string;
 }
 
-const Main = ({
-  defaultStatsGrid,
-  defaultChartsGrid,
-  visibleStats,
-  visibleCharts,
-  screenSize,
-  selectionType,
-  onExportSettings,
-}: MainProps) => {
+const Main = ({ activeSettings, selectionType, currentScreen }: MainProps) => {
   const [statsGrids, setStatsGrids] = useState<Record<string, number>>({});
   const [chartsGrids, setChartsGrids] = useState<Record<string, number>>({});
   const [selectedCard, setSelectedCard] = useState<{
@@ -43,31 +40,6 @@ const Main = ({
     setStatsGrids(loadSettings("statsGridSettings"));
     setChartsGrids(loadSettings("chartsGridSettings"));
   }, []);
-
-  // Reset individual card grids when the main grid changes
-  useEffect(() => {
-    const resetIndividualGrids = () => {
-      const newStatsGrids = { ...statsGrids };
-      const newChartsGrids = { ...chartsGrids };
-
-      Object.keys(newStatsGrids).forEach((id) => {
-        newStatsGrids[id] = defaultStatsGrid;
-      });
-      Object.keys(newChartsGrids).forEach((id) => {
-        newChartsGrids[id] = defaultChartsGrid;
-      });
-
-      setStatsGrids(newStatsGrids);
-      setChartsGrids(newChartsGrids);
-      localStorage.setItem("statsGridSettings", JSON.stringify(newStatsGrids));
-      localStorage.setItem(
-        "chartsGridSettings",
-        JSON.stringify(newChartsGrids)
-      );
-    };
-
-    resetIndividualGrids();
-  }, [defaultStatsGrid, defaultChartsGrid]);
 
   const handleCardClick = (id: string, type: "stats" | "charts") => {
     if (!selectionType || selectionType === type) {
@@ -93,46 +65,18 @@ const Main = ({
     setSelectedCard(null);
   };
 
-  const generateSettingsJson = () => {
-    return JSON.stringify(
-      {
-        settings: {
-          stats: {
-            visibleComponents: visibleStats,
-            defaultGrid: defaultStatsGrid,
-            customGrids: statsGrids,
-          },
-          charts: {
-            visibleComponents: visibleCharts,
-            defaultGrid: defaultChartsGrid,
-            customGrids: chartsGrids,
-          },
-          screenSize: screenSize,
-        },
-      },
-      null,
-      2
-    );
-  };
-
-  const handleExportClick = () => {
-    onExportSettings(generateSettingsJson());
-  };
-
   const renderCards = (
     cards: typeof statistics | typeof charts,
     title: string,
     type: "stats" | "charts"
   ) => {
-    const visibleCards = cards.filter((card) =>
-      type === "stats"
-        ? visibleStats.includes(card.id)
-        : visibleCharts.includes(card.id)
-    );
-
-    if (visibleCards.length === 0) return null;
-
+    const { visibleComponents, defaultGrid } = activeSettings[type];
     const grids = type === "stats" ? statsGrids : chartsGrids;
+
+    const visibleCards = cards.filter((card) =>
+      visibleComponents.includes(card.id)
+    );
+    if (visibleCards.length === 0) return null;
 
     return (
       <>
@@ -142,9 +86,7 @@ const Main = ({
             const isSelected =
               selectedCard?.id === card.id && selectedCard.type === type;
             const isEditable = !selectionType || selectionType === type;
-            const gridValue =
-              grids[card.id] ||
-              (type === "stats" ? defaultStatsGrid : defaultChartsGrid);
+            const gridValue = grids[card.id] || defaultGrid;
 
             return (
               <Col
@@ -184,22 +126,13 @@ const Main = ({
   return (
     <Card>
       <Typography.Title level={4} style={{ marginBottom: 16 }}>
-        Admin Panel Preview —<strong> Stats Grid:</strong> {defaultStatsGrid} |
-        <strong> Charts Grid:</strong> {defaultChartsGrid}
+        Admin Panel Preview — Current Screen: {currentScreen}
         {selectionType && (
           <Typography.Text type="secondary" style={{ marginLeft: 8 }}>
             (Editing: {selectionType})
           </Typography.Text>
         )}
       </Typography.Title>
-
-      <Button
-        onClick={handleExportClick}
-        style={{ marginBottom: 16 }}
-        type="primary"
-      >
-        Export Current Settings
-      </Button>
 
       {renderCards(statistics, "Statistics", "stats")}
       {renderCards(charts, "Charts", "charts")}
