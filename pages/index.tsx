@@ -10,10 +10,12 @@ interface ScreenSettings {
   stats?: {
     visibleComponents?: string[];
     defaultGrid?: number;
+    customGrids?: Record<string, number>;
   };
   charts?: {
     visibleComponents?: string[];
     defaultGrid?: number;
+    customGrids?: Record<string, number>;
   };
 }
 
@@ -22,10 +24,12 @@ interface AppSettings {
     stats: {
       visibleComponents: string[];
       defaultGrid: number;
+      customGrids: Record<string, number>;
     };
     charts: {
       visibleComponents: string[];
       defaultGrid: number;
+      customGrids: Record<string, number>;
     };
   };
   screenSpecific: Record<string, ScreenSettings>;
@@ -37,10 +41,12 @@ export default function Home() {
       stats: {
         visibleComponents: statistics.map((s) => s.id),
         defaultGrid: 4,
+        customGrids: {},
       },
       charts: {
         visibleComponents: charts.map((c) => c.id),
         defaultGrid: 12,
+        customGrids: {},
       },
     },
     screenSpecific: {},
@@ -72,15 +78,49 @@ export default function Home() {
       stats: {
         ...settings.default.stats,
         ...(screenConfig.stats || {}),
+        customGrids: {
+          ...settings.default.stats.customGrids,
+          ...(screenConfig.stats?.customGrids || {}),
+        },
       },
       charts: {
         ...settings.default.charts,
         ...(screenConfig.charts || {}),
+        customGrids: {
+          ...settings.default.charts.customGrids,
+          ...(screenConfig.charts?.customGrids || {}),
+        },
       },
     };
   };
 
   const activeSettings = getActiveSettings();
+
+  const handleGridChange = (
+    type: "stats" | "charts",
+    id: string,
+    value: number
+  ) => {
+    setSettings((prev) => {
+      const newSettings = { ...prev };
+
+      // Update for current screen if it has specific settings
+      if (newSettings.screenSpecific[currentScreen]?.[type]) {
+        newSettings.screenSpecific[currentScreen][type] = {
+          ...newSettings.screenSpecific[currentScreen][type],
+          customGrids: {
+            ...newSettings.screenSpecific[currentScreen][type]?.customGrids,
+            [id]: value,
+          },
+        };
+      } else {
+        // Update default settings
+        newSettings.default[type].customGrids[id] = value;
+      }
+
+      return newSettings;
+    });
+  };
 
   const resetStats = () => {
     setSettings((prev) => ({
@@ -90,6 +130,7 @@ export default function Home() {
         stats: {
           visibleComponents: statistics.map((s) => s.id),
           defaultGrid: 4,
+          customGrids: {},
         },
       },
     }));
@@ -104,6 +145,7 @@ export default function Home() {
         charts: {
           visibleComponents: charts.map((c) => c.id),
           defaultGrid: 12,
+          customGrids: {},
         },
       },
     }));
@@ -129,6 +171,7 @@ export default function Home() {
         activeSettings={activeSettings}
         selectionType={selectionType}
         currentScreen={currentScreen}
+        onGridChange={handleGridChange}
       />
       {jsonSettings && (
         <Card title="Current Settings JSON">

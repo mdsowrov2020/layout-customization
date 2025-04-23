@@ -8,38 +8,29 @@ interface MainProps {
     stats: {
       visibleComponents: string[];
       defaultGrid: number;
+      customGrids: Record<string, number>;
     };
     charts: {
       visibleComponents: string[];
       defaultGrid: number;
+      customGrids: Record<string, number>;
     };
   };
   selectionType: string | null;
   currentScreen: string;
+  onGridChange: (type: "stats" | "charts", id: string, value: number) => void;
 }
 
-const Main = ({ activeSettings, selectionType, currentScreen }: MainProps) => {
-  const [statsGrids, setStatsGrids] = useState<Record<string, number>>({});
-  const [chartsGrids, setChartsGrids] = useState<Record<string, number>>({});
+const Main = ({
+  activeSettings,
+  selectionType,
+  currentScreen,
+  onGridChange,
+}: MainProps) => {
   const [selectedCard, setSelectedCard] = useState<{
     id: string;
     type: "stats" | "charts";
   } | null>(null);
-
-  // Load saved grid settings
-  useEffect(() => {
-    const loadSettings = (key: string) => {
-      try {
-        const saved = localStorage.getItem(key);
-        return saved ? JSON.parse(saved) : {};
-      } catch {
-        return {};
-      }
-    };
-
-    setStatsGrids(loadSettings("statsGridSettings"));
-    setChartsGrids(loadSettings("chartsGridSettings"));
-  }, []);
 
   const handleCardClick = (id: string, type: "stats" | "charts") => {
     if (!selectionType || selectionType === type) {
@@ -51,17 +42,7 @@ const Main = ({ activeSettings, selectionType, currentScreen }: MainProps) => {
 
   const handleLayoutChange = (value: number) => {
     if (!selectedCard) return;
-
-    if (selectedCard.type === "stats") {
-      const newGrids = { ...statsGrids, [selectedCard.id]: value };
-      setStatsGrids(newGrids);
-      localStorage.setItem("statsGridSettings", JSON.stringify(newGrids));
-    } else {
-      const newGrids = { ...chartsGrids, [selectedCard.id]: value };
-      setChartsGrids(newGrids);
-      localStorage.setItem("chartsGridSettings", JSON.stringify(newGrids));
-    }
-
+    onGridChange(selectedCard.type, selectedCard.id, value);
     setSelectedCard(null);
   };
 
@@ -70,12 +51,12 @@ const Main = ({ activeSettings, selectionType, currentScreen }: MainProps) => {
     title: string,
     type: "stats" | "charts"
   ) => {
-    const { visibleComponents, defaultGrid } = activeSettings[type];
-    const grids = type === "stats" ? statsGrids : chartsGrids;
-
+    const { visibleComponents, defaultGrid, customGrids } =
+      activeSettings[type];
     const visibleCards = cards.filter((card) =>
       visibleComponents.includes(card.id)
     );
+
     if (visibleCards.length === 0) return null;
 
     return (
@@ -86,7 +67,7 @@ const Main = ({ activeSettings, selectionType, currentScreen }: MainProps) => {
             const isSelected =
               selectedCard?.id === card.id && selectedCard.type === type;
             const isEditable = !selectionType || selectionType === type;
-            const gridValue = grids[card.id] || defaultGrid;
+            const gridValue = customGrids[card.id] || defaultGrid;
 
             return (
               <Col
