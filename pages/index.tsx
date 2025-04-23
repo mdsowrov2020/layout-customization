@@ -71,7 +71,7 @@ export default function Home() {
 
   const handleGridChange = (
     type: "stats" | "charts",
-    id: string,
+    id: number, // Changed from string to number
     value: number
   ) => {
     setSettings((prev) => {
@@ -82,17 +82,16 @@ export default function Home() {
           ...newSettings.screenSpecific[currentScreen][type],
           customGrids: {
             ...newSettings.screenSpecific[currentScreen][type]?.customGrids,
-            [id]: value,
+            [id]: value, // Now using number as key
           },
         };
       } else {
-        newSettings.default[type].customGrids[id] = value;
+        newSettings.default[type].customGrids[id] = value; // Now using number as key
       }
 
       return newSettings;
     });
   };
-
   const resetAllSettings = () => {
     setSettings(JSON.parse(JSON.stringify(defaultSettings)));
     setSelectionType(null);

@@ -1,7 +1,7 @@
 export interface GridSettings {
-  visibleComponents: number[]; // Changed to number[] to match your data
+  visibleComponents: number[];
   defaultGrid: number;
-  customGrids: Record<number, number>; // Changed to number keys
+  customGrids: Record<number, number>; // Using number as key
 }
 
 export interface ScreenSettings {
