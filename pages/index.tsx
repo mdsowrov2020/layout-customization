@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import Controller from "./components/Controller";
 import Main from "./components/Main";
-import { statistics, charts, responsive } from "@/pages/data/data";
+import { statistics, charts, responsive } from "@/lib/data/data";
 import { Card, message } from "antd";
-import { AppSettings, ResponsiveBreakpoint } from "./model/type";
+import { AppSettings, ResponsiveBreakpoint } from "../lib/model/type";
 
 const defaultSettings: AppSettings = {
   default: {

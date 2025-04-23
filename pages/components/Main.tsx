@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Card, Col, Row, Typography } from "antd";
-import { statistics, charts } from "@/pages/data/data";
+import { statistics, charts } from "@/lib/data/data";
 import CustomGridSelect from "./CustomGridSelect";
-import { GridSettings } from "../model/type";
+import { GridSettings } from "../../lib/model/type";
 
 interface MainProps {
   activeSettings: {

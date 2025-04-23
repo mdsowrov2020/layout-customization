@@ -1,7 +1,7 @@
 import React from "react";
 import { Select, Typography } from "antd";
-import { GridOption } from "@/pages/model/type";
-import { grid } from "../data/data";
+import { GridOption } from "@/lib/model/type";
+import { grid } from "../../lib/data/data";
 
 interface CustomGridSelectProps {
   currentValue: number;

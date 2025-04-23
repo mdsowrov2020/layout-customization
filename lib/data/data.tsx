@@ -1,13 +1,13 @@
-import BarChartLib from "../components/BarChartLib";
-import ComposeChart from "../components/ComposeChart";
-import PieChartLib from "../components/PieChartLib";
+import BarChartLib from "../../pages/components/BarChartLib";
+import ComposeChart from "../../pages/components/ComposeChart";
+import PieChartLib from "../../pages/components/PieChartLib";
 import { Chart, GridOption, Statistic } from "../model/type";
-import ActiveUserCard from "../ui/ActiveUserCard";
-import FreeUserCard from "../ui/FreeUserCard";
-import StatisticCard from "../ui/StatisticCard";
-import TotalExpenseCard from "../ui/TotalExpenseCard";
-import TotalSaleCard from "../ui/TotalSaleCard";
-import UserCountCard from "../ui/UserCountCard";
+import ActiveUserCard from "../../pages/ui/ActiveUserCard";
+import FreeUserCard from "../../pages/ui/FreeUserCard";
+import StatisticCard from "../../pages/ui/StatisticCard";
+import TotalExpenseCard from "../../pages/ui/TotalExpenseCard";
+import TotalSaleCard from "../../pages/ui/TotalSaleCard";
+import UserCountCard from "../../pages/ui/UserCountCard";
 
 export const statistics: Statistic[] = [
   {

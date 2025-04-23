@@ -9,12 +9,12 @@ import {
   message,
 } from "antd";
 import React, { useEffect, useState } from "react";
-import { charts, grid, responsive, statistics } from "../data/data";
+import { charts, grid, responsive, statistics } from "../../lib/data/data";
 import {
   AppSettings,
   ResponsiveBreakpoint,
   GridOption,
-} from "@/pages/model/type";
+} from "@/lib/model/type";
 
 interface ControllerProps {
   settings: AppSettings;
