@@ -54,7 +54,7 @@ const Main = ({
     const { visibleComponents, defaultGrid, customGrids } =
       activeSettings[type];
     const visibleCards = cards.filter((card) =>
-      visibleComponents.includes(card.id)
+      visibleComponents.includes(String(card.id))
     );
 
     if (visibleCards.length === 0) return null;
@@ -65,7 +65,8 @@ const Main = ({
         <Row gutter={[16, 16]}>
           {visibleCards.map((card) => {
             const isSelected =
-              selectedCard?.id === card.id && selectedCard.type === type;
+              Number(selectedCard?.id) === card.id &&
+              selectedCard?.type === type;
             const isEditable = !selectionType || selectionType === type;
             const gridValue = customGrids[card.id] || defaultGrid;
 
@@ -82,7 +83,9 @@ const Main = ({
                 }}
               >
                 <div
-                  onClick={() => isEditable && handleCardClick(card.id, type)}
+                  onClick={() =>
+                    isEditable && handleCardClick(String(card.id), type)
+                  }
                   style={{ cursor: isEditable ? "pointer" : "default" }}
                 >
                   {card.component}
@@ -92,7 +95,7 @@ const Main = ({
                     <CustomGridSelect
                       currentValue={gridValue}
                       onChange={handleLayoutChange}
-                      selectedCardId={card.id}
+                      selectedCardId={String(card.id)}
                     />
                   </div>
                 )}
